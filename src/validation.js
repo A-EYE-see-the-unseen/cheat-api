@@ -1,7 +1,10 @@
 const { check } = require("express-validator");
 
-exports.signupValidation = [
-  check("nama_pengawas", "Name is requied").not().isEmpty(),
+const registerValidation = [
+  check("nip", "NIP is required").not().isEmpty().isNumeric().isLength({
+    min: 15,
+  }),
+  check("nama_pengawas", "Nama Pengawas is requied").not().isEmpty(),
   check("email", "Please include a valid email")
     .isEmail()
     .normalizeEmail({ gmail_remove_dots: true }),
@@ -10,7 +13,7 @@ exports.signupValidation = [
   }),
 ];
 
-exports.loginValidation = [
+const loginValidation = [
   check("email", "Please include a valid email")
     .isEmail()
     .normalizeEmail({ gmail_remove_dots: true }),
@@ -18,3 +21,5 @@ exports.loginValidation = [
     min: 6,
   }),
 ];
+
+module.exports = { registerValidation, loginValidation };
