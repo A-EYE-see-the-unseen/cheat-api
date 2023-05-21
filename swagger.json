@@ -1,0 +1,105 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Cheat App",
+    "description": "My Project Application API",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "host": "localhost:3000",
+  "basePath": "/api",
+  "tags": [
+    {
+      "name": "Users",
+      "description": "API for users in the system"
+    }
+  ],
+  "schemes": ["http"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/register": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Register foro pengawas user",
+          "parameters": [
+          {
+            "name": "pengawas",
+            "in": "body",
+            "description": "User that we want to create"
+          }
+        ],
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "New user is created"
+        }
+      }
+    }
+  },
+   "/login": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Login",
+          "parameters": [
+          {
+            "name": "pengawas",
+            "in": "body",
+            "description": "Login Pengawas"
+          }
+        ],
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Success Login"
+        }
+      }
+    }
+  }
+},
+  "definitions": {
+    "Pengawas": {
+      "required": ["id_pengawas", "nip", "nama_pengawas", "email", "password"],
+      "properties": {
+        "id_pengawas": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "nip": {
+          "type": "integer"
+        },
+        "nama_pengawas": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+       "password": {
+          "type": "string"
+        }
+      }  
+  },
+   "Report": {
+      "required": ["id_report", "tanggal", "keterangan", "id_pengawas"],
+      "properties": {
+        "id_report": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "tanggal": {
+          "type": "timestamp"
+        },
+        "keterangan": {
+          "type": "string"
+        },
+        "id_pengawas": {
+          "type": "integer"
+        }
+      }  
+  }
+}
+}
+  
