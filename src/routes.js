@@ -1,60 +1,55 @@
 const express = require("express");
 const router = express.Router();
-const Connection = require("./database");
-const { signupValidation, loginValidation } = require("./validation");
-const jwt = require("jsonwebtoken");
+const db = require("./database");
+const { registerValidation, loginValidation } = require("./validation");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const logger = require("./logger");
 
-router.post(
-  "/admin/register/S2FtdSBDaGVhdGluZw==",
-  signupValidation,
-  (req, res, next) => {
-    Connection.query(
-      `SELECT * FROM pengawas WHERE LOWER(email) = LOWER(${Connection.escape(
-        req.body.email
-      )});`,
-      (err, result) => {
-        if (result.length) {
-          return res.status(409).send({
-            msg: "This user is already in use!",
-          });
-        } else {
-          bcrypt.hash(req.body.password, 10, (err, hash) => {
-            if (err) {
-              return res.status(500).send({
-                msg: err,
-              });
-            } else {
-              Connection.query(
-                `INSERT INTO pengawas (nip, nama_pengawas, email, password) VALUES ('${
-                  req.body.nip
-                }','${req.body.nama_pengawas}', ${Connection.escape(
-                  req.body.email
-                )}, ${Connection.escape(hash)})`,
-                (err, result) => {
-                  if (err) {
-                    throw err;
-                    return res.status(400).send({
-                      msg: err,
-                    });
-                  }
-                  return res.status(201).send({
-                    msg: "The user has been registerd with us!",
+router.post("/register", registerValidation, (req, res) => {
+  const { nip, nama_pengawas, email, password } = req.body;
+  logger.log("info", `${nip} ${nama_pengawas} ${email} ${password}`);
+
+  db.query(
+    `SELECT * FROM pengawas WHERE LOWER(email) = LOWER(${db.escape(email)});`,
+    (err, result) => {
+      if (result.length) {
+        return res.status(409).send({
+          msg: "This user is already in use!",
+        });
+      } else {
+        bcrypt.hash(password, 10, (err, hash) => {
+          if (err) {
+            return res.status(500).send({
+              msg: `error at ${err}`,
+            });
+          } else {
+            db.query(
+              `INSERT INTO pengawas (nip, nama_pengawas, email, password) VALUES (${nip}, '${nama_pengawas}', ${db.escape(
+                email
+              )}, ${db.escape(hash)})`,
+              (err, result) => {
+                if (err) {
+                  throw err;
+                  return res.status(400).send({
+                    msg: err,
                   });
                 }
-              );
-            }
-          });
-        }
+                return res.status(201).send({
+                  msg: "Pengawas Success Register!",
+                });
+              }
+            );
+          }
+        });
       }
-    );
-  }
-);
-
-router.post("/login", loginValidation, (req, res, next) => {
-  // const { username, password } = req.body;
-  const check = Connection.query(
-    `SELECT * FROM pengawas WHERE email = ${Connection.escape(req.body.email)}`,
+    }
+  );
+});
+router.post("/login", loginValidation, (req, res) => {
+  const { email, password } = req.body;
+  db.query(
+    `SELECT * FROM pengawas WHERE email = ${db.escape(email)};`,
     (err, result) => {
       if (err) {
         throw err;
@@ -67,36 +62,29 @@ router.post("/login", loginValidation, (req, res, next) => {
           msg: "Email or password is incorrect!",
         });
       }
-
-      bcrypt.compare(
-        req.body.password,
-        result[0]["password"],
-        (bErr, bResult) => {
-          if (bErr) {
-            throw bErr;
-            return res.status(401).send({
-              msg: "Email or password is incorrect!",
-            });
-          }
-          if (bResult) {
-            const token = jwt.sign(
-              { nip: result[0].nip },
-              "the-super-strong-secrect",
-              { expiresIn: "1h" }
-            );
-            Connection.query(
-              `UPDATE pengawas SET last_login = now() WHERE nip = '${result[0].nip}'`
-            );
-            return res.status(200).send({
-              token,
-              user: result[0],
-            });
-          }
+      bcrypt.compare(password, result[0]["password"], (bError, bResult) => {
+        if (bError) {
+          throw bError;
           return res.status(401).send({
-            msg: "Username or password is incorrect!",
+            msg: "Email or password is incorrect!",
           });
         }
-      );
+        if (bResult) {
+          const token = jwt.sign(
+            { id_pengawas: result[0].id_pengawas },
+            "the-super-strong-secrect",
+            { expiresIn: "1h" }
+          );
+
+          return res.status(200).send({
+            token,
+            user: result[0],
+          });
+        }
+        return res.status(401).send({
+          msg: "Username or password is incorrect!",
+        });
+      });
     }
   );
 });
