@@ -5,7 +5,24 @@ const { registerValidation, loginValidation } = require("./validation");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const logger = require("./logger");
+const { google } = require("googleapis");
+const { Logger } = require("winston");
+const compute = google.compute("v1");
 
+// ====== Public Variables =======
+const auth = new google.auth.GoogleAuth({
+  keyFile: "./src/credential.json",
+  scopes: ["https://www.googleapis.com/auth/compute"],
+});
+const requestInstance = {
+  project: "a-eye-project",
+  zone: "cheat-app",
+  instance: "asia-southeast2-a",
+};
+
+// ====== Handler ========
+
+// Register Pengawas
 router.post("/register", registerValidation, (req, res) => {
   const { nip, nama_pengawas, email, password } = req.body;
   logger.log("info", `${nip} ${nama_pengawas} ${email} ${password}`);
@@ -46,6 +63,8 @@ router.post("/register", registerValidation, (req, res) => {
     }
   );
 });
+
+// Login Pengawas
 router.post("/login", loginValidation, (req, res) => {
   const { email, password } = req.body;
   db.query(
@@ -75,7 +94,7 @@ router.post("/login", loginValidation, (req, res) => {
             "the-super-strong-secrect",
             { expiresIn: "1h" }
           );
-
+          Logger.log("info", `Sucees Login ${email}`);
           return res.status(200).send({
             token,
             user: result[0],
@@ -87,6 +106,28 @@ router.post("/login", loginValidation, (req, res) => {
       });
     }
   );
+});
+
+router.post("/start-instance", async (req, res) => {
+  try {
+    const authClient = await auth.getClient();
+    google.options({ auth: authClient });
+    await compute.instances.start(requestInstance);
+    res.status(200).send("Instance started success!");
+  } catch (error) {
+    res.status(500).send("Failed to start instance.");
+  }
+});
+
+router.post("/stop-instance", async (req, res) => {
+  try {
+    const authClient = await auth.getClient();
+    google.options({ auth: authClient });
+    await compute.instances.stop(requestInstance);
+    res.status(200).send("Instance stopped success!");
+  } catch (error) {
+    res.status(500).send("Failed to stop instance.");
+  }
 });
 
 module.exports = router;
