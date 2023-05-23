@@ -15,6 +15,10 @@
     {
       "name": "Users",
       "description": "API for users in the system"
+    },
+    {
+      "name": "Instance",
+      "description": "API for related Instance Environtment"
     }
   ],
   "schemes": ["http"],
@@ -57,6 +61,18 @@
             "description": "Success Login"
         }
       }
+    }
+  },
+  "/start-instance": {
+      "post": {
+        "tags": ["Instance"],
+        "produces": ["application/json"]
+    }
+  },
+   "/stop-instance": {
+      "post": {
+        "tags": ["Instance"],
+        "produces": ["application/json"]
     }
   }
 },
