@@ -58,6 +58,18 @@
         }
       }
     }
+  },
+  "/start-instance": {
+      "post": {
+        "tags": ["Users"],
+        "produces": ["application/json"]
+    }
+  },
+   "/stop-instance": {
+      "post": {
+        "tags": ["Users"],
+        "produces": ["application/json"]
+    }
   }
 },
   "definitions": {
