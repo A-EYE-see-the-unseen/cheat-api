@@ -8,17 +8,13 @@ const logger = require("./logger");
 const { google } = require("googleapis");
 const { Logger } = require("winston");
 const compute = google.compute("v1");
+const requestInstance = require("./secret/instance");
 
 // ====== Public Variables =======
 const auth = new google.auth.GoogleAuth({
-  keyFile: "./src/credential.json",
+  keyFile: "./src/secret/credential.json",
   scopes: ["https://www.googleapis.com/auth/compute"],
 });
-const requestInstance = {
-  project: "a-eye-project",
-  zone: "cheat-app",
-  instance: "asia-southeast2-a",
-};
 
 // ====== Handler ========
 
@@ -115,6 +111,9 @@ router.post("/start-instance", async (req, res) => {
     await compute.instances.start(requestInstance);
     res.status(200).send("Instance started success!");
   } catch (error) {
+    console.log(
+      `error at ${error} | ${requestInstance.project}, ${requestInstance.zone}`
+    );
     res.status(500).send("Failed to start instance.");
   }
 });
