@@ -66,13 +66,22 @@
   "/start-instance": {
       "post": {
         "tags": ["Instance"],
-        "produces": ["application/json"]
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Respon when success"
+        }
+    }
     }
   },
    "/stop-instance": {
       "post": {
         "tags": ["Instance"],
-        "produces": ["application/json"]
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Respon when success"
+        }
     }
   }
 },
@@ -116,6 +125,7 @@
         }
       }  
   }
+}
 }
 }
   
