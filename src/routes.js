@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const db = require("./database");
-const { registerValidation, loginValidation } = require("./validation");
+const { registerValidation, loginValidation, logoutValidation } = require("./validation");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const logger = require("./logger");
@@ -87,6 +87,33 @@ router.post("/login", loginValidation, (req, res) => {
       });
     }
   );
+});
+router.post("/logout", logoutValidation, (req, res) => {
+  const { token } = req.body;
+
+  // Verify and decode the token
+  jwt.verify(token, "the-super-strong-secrect", (err, decoded) => {
+    if (err) {
+      return res.status(401).send({
+        msg: "Invalid token",
+      });
+    }
+
+    // Destroy the token
+    jwt.destroy(token, (err) => {
+      if (err) {
+        return res.status(500).send({
+          msg: "Failed to destroy token",
+        });
+      }
+
+      logger.log("info", `User logged out: ${decoded.id_pengawas}`);
+
+      return res.status(200).send({
+        msg: "Logout successful",
+      });
+    });
+  });
 });
 
 module.exports = router;
