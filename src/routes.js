@@ -99,19 +99,13 @@ router.post("/logout", logoutValidation, (req, res) => {
       });
     }
 
-    // Destroy the token
-    jwt.destroy(token, (err) => {
-      if (err) {
-        return res.status(500).send({
-          msg: "Failed to destroy token",
-        });
-      }
+    // Perform logout actions (if any)
+    // ...
 
-      logger.log("info", `User logged out: ${decoded.id_pengawas}`);
+    logger.log("info", `User logged out: ${decoded.id_pengawas}`);
 
-      return res.status(200).send({
-        msg: "Logout successful",
-      });
+    return res.status(200).send({
+      msg: "Logout successful",
     });
   });
 });
