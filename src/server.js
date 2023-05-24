@@ -1,7 +1,9 @@
 const express = require("express");
+const router = express.Router();
+const path = require("path");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const router = require("./routes");
+const routes = require("./routes");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("../swagger.json");
 const app = express();
@@ -14,8 +16,13 @@ app.use(
   })
 );
 app.use(cors());
+router.get("/", (req, res) => {
+  console.log("Hello World");
+  res.sendFile(path.resolve("./style/index.html"));
+});
 
-app.use("/api", router);
+app.use("/", router);
+app.use("/api", routes);
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 const port = process.env.PORT || 3000;
