@@ -15,6 +15,10 @@
     {
       "name": "Users",
       "description": "API for users in the system"
+    },
+    {
+      "name": "Instance",
+      "description": "API for related Instance Environtment"
     }
   ],
   "schemes": ["http"],
@@ -58,6 +62,27 @@
         }
       }
     }
+  },
+  "/start-instance": {
+      "post": {
+        "tags": ["Instance"],
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Respon when success"
+        }
+    }
+    }
+  },
+   "/stop-instance": {
+      "post": {
+        "tags": ["Instance"],
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Respon when success"
+        }
+    }
   }
 },
   "definitions": {
@@ -100,6 +125,7 @@
         }
       }  
   }
+}
 }
 }
   
