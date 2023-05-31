@@ -22,8 +22,4 @@ const loginValidation = [
   }),
 ];
 
-const logoutValidation = [
-  check("token", "Token is required").not().isEmpty(),
-];
-
-module.exports = { registerValidation, loginValidation, logoutValidation };
+module.exports = { registerValidation, loginValidation };
