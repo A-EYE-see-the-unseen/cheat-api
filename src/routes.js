@@ -87,11 +87,11 @@ router.post("/login", loginValidation, (req, res) => {
           });
         }
         if (bResult) {
-          const token = jwt.sign(
-            { id_pengawas: result[0].id_pengawas },
-            "the-super-strong-secrect",
-            { expiresIn: "1h" }
-          );
+          const id_pengawas = result[0].id_pengawas;
+          const token = jwt.sign({ id_pengawas }, "the-super-strong-secrect", {
+            expiresIn: "1d",
+          });
+          res.cookie("token", token);
           logger.log("info", `Succees Login ${email}`);
           return res.status(200).send({
             token,
@@ -105,26 +105,46 @@ router.post("/login", loginValidation, (req, res) => {
     }
   );
 });
-router.post("/logout", logoutValidation, (req, res) => {
-  const { token } = req.body;
 
-  // Verify and decode the token
-  jwt.verify(token, "the-super-strong-secrect", (err, decoded) => {
-    if (err) {
+// verify token JWT
+router.get("/verify-token", (req, res, next) => {
+  const token = req.cookies.token;
+  if (!token) {
+    return res.status(401).send({
+      message: "need login or token!",
+    });
+  } else {
+    jwt.verify(token, "the-super-strong-secrect", (err, decoded) => {
+      if (err) {
+        return res.status(400).send({
+          message: "Auth Error!",
+        });
+      } else {
+        return res.status(200).send({ message: "success" });
+      }
+    });
+  }
+});
+
+// Logout Pengawas
+router.get("/logout", (req, res) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
       return res.status(401).send({
-        msg: "Invalid token",
+        message: "need login or token null",
+      });
+    } else {
+      res.clearCookie("token");
+      return res.status(200).send({
+        message: "Success Logout!",
       });
     }
-
-    // Perform logout actions (if any)
-    // ...
-
-    logger.log("info", `User logged out: ${decoded.id_pengawas}`);
-
-    return res.status(200).send({
-      msg: "Logout successful",
+  } catch (err) {
+    return res.status(500).send({
+      message: `${err}`,
     });
-  });
+  }
 });
 
 router.post("/start-instance", async (req, res) => {
