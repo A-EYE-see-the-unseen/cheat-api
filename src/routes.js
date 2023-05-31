@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const db = require("./database");
-const { registerValidation, loginValidation, logoutValidation } = require("./validation");
+const Connection = require("./database");
+const { registerValidation, loginValidation } = require("./validation");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const logger = require("./logger");
@@ -23,8 +23,10 @@ router.post("/register", registerValidation, (req, res) => {
   const { nip, nama_pengawas, email, password } = req.body;
   logger.log("info", `${nip} ${nama_pengawas} ${email} ${password}`);
 
-  db.query(
-    `SELECT * FROM pengawas WHERE LOWER(email) = LOWER(${db.escape(email)});`,
+  Connection.query(
+    `SELECT * FROM pengawas WHERE LOWER(email) = LOWER(${Connection.escape(
+      email
+    )});`,
     (err, result) => {
       if (result.length) {
         return res.status(409).send({
@@ -37,10 +39,10 @@ router.post("/register", registerValidation, (req, res) => {
               msg: `error at ${err}`,
             });
           } else {
-            db.query(
-              `INSERT INTO pengawas (nip, nama_pengawas, email, password) VALUES (${nip}, '${nama_pengawas}', ${db.escape(
+            Connection.query(
+              `INSERT INTO pengawas (nip, nama_pengawas, email, password) VALUES (${nip}, '${nama_pengawas}', ${Connection.escape(
                 email
-              )}, ${db.escape(hash)})`,
+              )}, ${Connection.escape(hash)})`,
               (err, result) => {
                 if (err) {
                   throw err;
@@ -63,8 +65,8 @@ router.post("/register", registerValidation, (req, res) => {
 // Login Pengawas
 router.post("/login", loginValidation, (req, res) => {
   const { email, password } = req.body;
-  db.query(
-    `SELECT * FROM pengawas WHERE email = ${db.escape(email)};`,
+  Connection.query(
+    `SELECT * FROM pengawas WHERE email = ${Connection.escape(email)};`,
     (err, result) => {
       if (err) {
         throw err;
@@ -90,7 +92,7 @@ router.post("/login", loginValidation, (req, res) => {
             "the-super-strong-secrect",
             { expiresIn: "1h" }
           );
-          Logger.log("info", `Sucees Login ${email}`);
+          logger.log("info", `Succees Login ${email}`);
           return res.status(200).send({
             token,
             user: result[0],
