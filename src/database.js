@@ -4,11 +4,13 @@ const Connection = mysql.createConnection({
   user: "root",
   password: "",
   database: "cheating",
+  port: 3306,
+  multipleStatements: true,
 });
 
 Connection.connect(function (err) {
   if (err) {
-    console.log(`Error in part ${err}`);
+    console.log("error");
   } else {
     console.log("Database connected!");
   }
