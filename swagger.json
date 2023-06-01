@@ -28,7 +28,6 @@
     "/register": {
       "post": {
         "tags": ["Users"],
-        "summary": "Register foro pengawas user",
           "parameters": [
           {
             "name": "pengawas",
@@ -47,7 +46,6 @@
    "/login": {
       "post": {
         "tags": ["Users"],
-        "summary": "Login",
           "parameters": [
           {
             "name": "pengawas",
@@ -59,6 +57,34 @@
         "responses": {
           "200": {
             "description": "Success Login"
+        }
+      }
+    }
+  },
+   "/verify-token": {
+      "get": {
+        "tags": ["Users"],
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Token already in Cookies"
+        },
+          "401": {
+            "description": "Need Token"
+        }
+      }
+    }
+  },
+   "/logout": {
+      "get": {
+        "tags": ["Users"],
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Success Logout"
+        },
+         "401": {
+            "description": "Need Token or nothing token in cookies"
         }
       }
     }
