@@ -22,6 +22,7 @@
     "googleapis": "^118.0.0",
     "jsonwebtoken": "^9.0.0",
     "mysql": "^2.18.1",
+    "short-uuid": "^4.2.2",
     "swagger-ui-express": "^4.6.3",
     "winston": "^3.8.2"
   }
