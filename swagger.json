@@ -75,6 +75,27 @@
       }
     }
   },
+    "/store-report": {
+      "post": {
+        "tags": ["Users"],
+          "parameters": [
+          {
+            "name": "data reporting",
+            "in": "body",
+            "description": "User that we want to create"
+          }
+        ],
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "success store data report"
+        },
+        "500": {
+            "description": "internal server error"
+        }
+      }
+    }
+  },
    "/logout": {
       "get": {
         "tags": ["Users"],
