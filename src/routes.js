@@ -6,7 +6,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const logger = require("./logger");
 const { google } = require("googleapis");
-const { Logger } = require("winston");
+const shortId = require("short-uuid");
 const compute = google.compute("v1");
 const requestInstance = require("./secret/instance");
 
@@ -120,9 +120,48 @@ router.get("/verify-token", (req, res, next) => {
           message: "Auth Error!",
         });
       } else {
-        return res.status(200).send({ message: "success" });
+        const id = decoded.id_pengawas;
+        return res
+          .status(200)
+          .send({ id_pengawas: id, message: "still in session auth" });
       }
     });
+  }
+});
+
+// store report cheating
+router.post("/store-report", (req, res) => {
+  const token = req.cookies.token;
+  if (!token)
+    return res.status(401).send({
+      message: "cannot store data, need login session or token",
+    });
+  const payload = jwt.verify(token, "the-super-strong-secrect");
+  try {
+    const id_report = shortId.generate();
+    const tanggal = new Date().toISOString().slice(0, 19).replace("T", " ");
+    const { keterangan } = req.body;
+    const id_pengawas = payload.id_pengawas;
+
+    logger.log(
+      "info",
+      `${keterangan}, ${id_report}, ${tanggal}, ${id_pengawas}`
+    );
+
+    Connection.query(
+      `INSERT INTO report (id_report, tanggal, keterangan, id_pengawas) VALUES ("${id_report}", "${tanggal}", "${keterangan}", ${id_pengawas})`,
+      (err, result) => {
+        if (err) {
+          throw err;
+          return res.status(500).send({ message: `error in ${err}` });
+        }
+        return res.status(200).send({
+          message: `Success store report with id report ${id_report}!`,
+        });
+      }
+    );
+  } catch (err) {
+    return res.status(500).send({ message: `error in ${err}` });
   }
 });
 
