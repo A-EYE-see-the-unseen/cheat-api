@@ -42,6 +42,7 @@
           }
         }
       }
+    }
      },
      "/login": {
         "post": {
@@ -60,6 +61,7 @@
           }
         }
       }
+    }
      },
      "/verify-token": {
         "get": {
@@ -95,84 +97,98 @@
           }
         }
       }
-     },
-     "/logout": {
-        "get": {
-          "tags": ["Users"],
-          "produces": ["application/json"],
-          "responses": {
-            "200": {
-              "description": "Success Logout"
-          },
-           "401": {
-              "description": "Need Token or nothing token in cookies"
-          }
+    }
+   },
+      "/get-report": {
+      "get": {
+        "tags": ["Users"],
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "success get all data report"
+        },
+        "500": {
+            "description": "internal server error"
         }
       }
-     },
-     "/start-instance": {
-        "post": {
-          "tags": ["Instance"],
-          "produces": ["application/json"],
-          "responses": {
-            "200": {
-              "description": "Respon when success"
-          }
+    }
+   },
+   "/logout": {
+      "get": {
+        "tags": ["Users"],
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Success Logout"
+        },
+         "401": {
+            "description": "Need Token or nothing token in cookies"
+        }
       }
-      }
-     },
-     "/stop-instance": {
-        "post": {
-          "tags": ["Instance"],
-          "produces": ["application/json"],
-          "responses": {
-            "200": {
-              "description": "Respon when success"
-          }
-      }
-      }
-      }
-    },
-
-    "definitions": { 
-        "Pengawas": {
-            "required": ["id_pengawas", "nip", "nama_pengawas", "email", "password"],
-            "properties": {
-              "id_pengawas": {
-                "type": "integer",
-                "uniqueItems": true
-              },
-              "nip": {
-                "type": "integer"
-              },
-              "nama_pengawas": {
-                "type": "string"
-              },
-              "email": {
-                "type": "string"
-              },
-             "password": {
-                "type": "string"
-              }
-            }  
-         },
-         "Report": {
-            "required": ["id_report", "tanggal", "keterangan", "id_pengawas"],
-            "properties": {
-              "id_report": {
-                "type": "integer",
-                "uniqueItems": true
-              },
-              "tanggal": {
-                "type": "timestamp"
-              },
-              "keterangan": {
-                "type": "string"
-              },
-              "id_pengawas": {
-                "type": "integer"
-              }
-            }  
+    }
+   },
+   "/start-instance": {
+      "post": {
+        "tags": ["Instance"],
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Respon when success"
         }
     }
+    }
+   },
+   "/stop-instance": {
+      "post": {
+        "tags": ["Instance"],
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "Respon when success"
+        }
+    }
+   }
+   }
+},
+  "definitions": {
+       "Pengawas": {
+      "required": ["id_pengawas", "nip", "nama_pengawas", "email", "password"],
+      "properties": {
+        "id_pengawas": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "nip": {
+          "type": "integer"
+        },
+        "nama_pengawas": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+       "password": {
+          "type": "string"
+        }
+      }  
+  },
+   "Report": {
+      "required": ["id_report", "tanggal", "keterangan", "id_pengawas"],
+      "properties": {
+        "id_report": {
+          "type": "integer",
+          "uniqueItems": true
+        },
+        "tanggal": {
+          "type": "timestamp"
+        },
+        "keterangan": {
+          "type": "string"
+        },
+        "id_pengawas": {
+          "type": "integer"
+        }
+      }  
   }
+  }
+}
