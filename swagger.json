@@ -42,7 +42,7 @@
         }
       }
     }
-  },
+   },
    "/login": {
       "post": {
         "tags": ["Users"],
@@ -60,7 +60,7 @@
         }
       }
     }
-  },
+   },
    "/verify-token": {
       "get": {
         "tags": ["Users"],
@@ -74,7 +74,7 @@
         }
       }
     }
-  },
+   },
     "/store-report": {
       "post": {
         "tags": ["Users"],
@@ -95,7 +95,7 @@
         }
       }
     }
-  },
+   },
       "/get-report": {
       "get": {
         "tags": ["Users"],
@@ -109,7 +109,7 @@
         }
       }
     }
-  },
+   },
    "/logout": {
       "get": {
         "tags": ["Users"],
@@ -123,8 +123,8 @@
         }
       }
     }
-  },
-  "/start-instance": {
+   },
+   "/start-instance": {
       "post": {
         "tags": ["Instance"],
         "produces": ["application/json"],
@@ -134,7 +134,7 @@
         }
     }
     }
-  },
+   },
    "/stop-instance": {
       "post": {
         "tags": ["Instance"],
@@ -144,10 +144,11 @@
             "description": "Respon when success"
         }
     }
-  }
+   }
+   }
 },
   "definitions": {
-    "Pengawas": {
+       "Pengawas": {
       "required": ["id_pengawas", "nip", "nama_pengawas", "email", "password"],
       "properties": {
         "id_pengawas": {
@@ -186,7 +187,6 @@
         }
       }  
   }
-}
-}
+  }
 }
   
