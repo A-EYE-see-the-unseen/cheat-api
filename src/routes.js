@@ -165,6 +165,32 @@ router.post("/store-report", (req, res) => {
   }
 });
 
+// get data report
+router.get("/report", (req, res) => {
+  const token = req.cookies.token;
+  if (!token) {
+    return res.status(401).send({
+      message: "Cannot get data, login session or token is required",
+    });
+  }
+  
+  try {
+    Connection.query(
+      "SELECT * FROM report",
+      (err, result) => {
+        if (err) {
+          throw err;
+          return res.status(500).send({ message: `Error: ${err.message}` });
+        }
+        return res.status(200).json(result);
+      }
+    );
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send({ message: `Error: ${err.message}` });
+  }
+});
+
 // Logout Pengawas
 router.get("/logout", (req, res) => {
   try {
