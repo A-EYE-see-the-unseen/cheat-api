@@ -15,13 +15,7 @@ app.use(
     extended: true,
   })
 );
-app.use(
-  cors({
-    origin: ["*"],
-    methods: ["POST", "GET"],
-  })
-);
-
+app.use(cors());
 app.use("/api", router);
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
