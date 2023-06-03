@@ -9,6 +9,7 @@ const { google } = require("googleapis");
 const shortId = require("short-uuid");
 const compute = google.compute("v1");
 const requestInstance = require("./secret/instance");
+const moment = require("moment");
 
 // ====== Public Variables =======
 const auth = new google.auth.GoogleAuth({
@@ -139,7 +140,7 @@ router.post("/store-report", (req, res) => {
   const payload = jwt.verify(token, "the-super-strong-secrect");
   try {
     const id_report = shortId.generate();
-    const tanggal = new Date().toISOString().slice(0, 19).replace("T", " ");
+    const tanggal = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
     const { keterangan } = req.body;
     const id_pengawas = payload.id_pengawas;
 
