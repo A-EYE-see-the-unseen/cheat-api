@@ -1,178 +1,178 @@
 {
-  "swagger": "2.0",
-  "info": {
-    "version": "1.0.0",
-    "title": "Cheat App",
-    "description": "My Project Application API",
-    "license": {
-      "name": "MIT",
-      "url": "https://opensource.org/licenses/MIT"
-    }
-  },
-  "host": "localhost:3000",
-  "basePath": "/api",
-  "tags": [
-    {
-      "name": "Users",
-      "description": "API for users in the system"
+    "swagger": "2.0",
+    "info": {
+      "version": "1.0.0",
+      "title": "Cheat App",
+      "description": "My Project Application API",
+      "license": {
+        "name": "MIT",
+        "url": "https://opensource.org/licenses/MIT"
+      }
     },
-    {
-      "name": "Instance",
-      "description": "API for related Instance Environtment"
-    }
-  ],
-  "schemes": ["http"],
-  "consumes": ["application/json"],
-  "produces": ["application/json"],
-  "paths": {
-    "/register": {
-      "post": {
-        "tags": ["Users"],
-          "parameters": [
-          {
-            "name": "pengawas",
-            "in": "body",
-            "description": "User that we want to create"
+    "host": "a-eye-project.et.r.appspot.com",
+    "basePath": "/api",
+    "tags": [
+      {
+        "name": "Users",
+        "description": "API for users in the system"
+      },
+      {
+        "name": "Instance",
+        "description": "API for related Instance Environtment"
+      }
+    ],
+    "schemes": ["http","https"],
+    "consumes": ["application/json"],
+    "produces": ["application/json"],
+    "paths": {
+      "/register": {
+        "post": {
+          "tags": ["Users"],
+            "parameters": [
+            {
+              "name": "pengawas",
+              "in": "body",
+              "description": "sample : { \"nip\":\"123456789\", \"nama_pengawas\":\"Huda\", \"email\":\"huda@gmail.com\", \"password\":\"huda123\" } "
+            }
+          ],
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "New user is created"
           }
-        ],
-        "produces": ["application/json"],
-        "responses": {
-          "200": {
-            "description": "New user is created"
         }
       }
-    }
-  },
-   "/login": {
-      "post": {
-        "tags": ["Users"],
-          "parameters": [
-          {
-            "name": "pengawas",
-            "in": "body",
-            "description": "Login Pengawas"
+     },
+     "/login": {
+        "post": {
+          "tags": ["Users"],
+            "parameters": [
+            {
+              "name": "pengawas",
+              "in": "body",
+              "description": "sample : { \"email\":\"huda@gmail.com\", \"password\":\"huda123\" }"
+            }
+          ],
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "Success Login"
           }
-        ],
-        "produces": ["application/json"],
-        "responses": {
-          "200": {
-            "description": "Success Login"
         }
       }
-    }
-  },
-   "/verify-token": {
-      "get": {
-        "tags": ["Users"],
-        "produces": ["application/json"],
-        "responses": {
-          "200": {
-            "description": "Token already in Cookies"
-        },
-          "401": {
-            "description": "Need Token"
-        }
-      }
-    }
-  },
-    "/store-report": {
-      "post": {
-        "tags": ["Users"],
-          "parameters": [
-          {
-            "name": "data reporting",
-            "in": "body",
-            "description": "User that we want to create"
+     },
+     "/verify-token": {
+        "get": {
+          "tags": ["Users"],
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "Token already in Cookies"
+          },
+            "401": {
+              "description": "Need Token"
           }
-        ],
-        "produces": ["application/json"],
-        "responses": {
-          "200": {
-            "description": "success store data report"
-        },
-        "500": {
-            "description": "internal server error"
         }
       }
-    }
-  },
-   "/logout": {
-      "get": {
-        "tags": ["Users"],
-        "produces": ["application/json"],
-        "responses": {
-          "200": {
-            "description": "Success Logout"
-        },
-         "401": {
-            "description": "Need Token or nothing token in cookies"
+     },
+      "/store-report": {
+        "post": {
+          "tags": ["Users"],
+            "parameters": [
+            {
+              "name": "data reporting",
+              "in": "body",
+              "description": "sample : { \"keterangan\":\"Huda Ngecheat ya, ketahuan!\" }"
+            }
+          ],
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "success store data report"
+          },
+          "500": {
+              "description": "internal server error"
+          }
         }
       }
-    }
-  },
-  "/start-instance": {
-      "post": {
-        "tags": ["Instance"],
-        "produces": ["application/json"],
-        "responses": {
-          "200": {
-            "description": "Respon when success"
+     },
+     "/logout": {
+        "get": {
+          "tags": ["Users"],
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "Success Logout"
+          },
+           "401": {
+              "description": "Need Token or nothing token in cookies"
+          }
         }
-    }
-    }
-  },
-   "/stop-instance": {
-      "post": {
-        "tags": ["Instance"],
-        "produces": ["application/json"],
-        "responses": {
-          "200": {
-            "description": "Respon when success"
+      }
+     },
+     "/start-instance": {
+        "post": {
+          "tags": ["Instance"],
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "Respon when success"
+          }
+      }
+      }
+     },
+     "/stop-instance": {
+        "post": {
+          "tags": ["Instance"],
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "Respon when success"
+          }
+      }
+      }
+      }
+    },
+
+    "definitions": { 
+        "Pengawas": {
+            "required": ["id_pengawas", "nip", "nama_pengawas", "email", "password"],
+            "properties": {
+              "id_pengawas": {
+                "type": "integer",
+                "uniqueItems": true
+              },
+              "nip": {
+                "type": "integer"
+              },
+              "nama_pengawas": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string"
+              },
+             "password": {
+                "type": "string"
+              }
+            }  
+         },
+         "Report": {
+            "required": ["id_report", "tanggal", "keterangan", "id_pengawas"],
+            "properties": {
+              "id_report": {
+                "type": "integer",
+                "uniqueItems": true
+              },
+              "tanggal": {
+                "type": "timestamp"
+              },
+              "keterangan": {
+                "type": "string"
+              },
+              "id_pengawas": {
+                "type": "integer"
+              }
+            }  
         }
     }
   }
-},
-  "definitions": {
-    "Pengawas": {
-      "required": ["id_pengawas", "nip", "nama_pengawas", "email", "password"],
-      "properties": {
-        "id_pengawas": {
-          "type": "integer",
-          "uniqueItems": true
-        },
-        "nip": {
-          "type": "integer"
-        },
-        "nama_pengawas": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-       "password": {
-          "type": "string"
-        }
-      }  
-  },
-   "Report": {
-      "required": ["id_report", "tanggal", "keterangan", "id_pengawas"],
-      "properties": {
-        "id_report": {
-          "type": "integer",
-          "uniqueItems": true
-        },
-        "tanggal": {
-          "type": "timestamp"
-        },
-        "keterangan": {
-          "type": "string"
-        },
-        "id_pengawas": {
-          "type": "integer"
-        }
-      }  
-  }
-}
-}
-}
-  
