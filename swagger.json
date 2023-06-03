@@ -42,7 +42,6 @@
           }
         }
       }
-    }
      },
      "/login": {
         "post": {
@@ -61,8 +60,7 @@
           }
         }
       }
-    }
-     },
+      },
      "/verify-token": {
         "get": {
           "tags": ["Users"],
@@ -76,7 +74,7 @@
           }
         }
       }
-     },
+      },
       "/store-report": {
         "post": {
           "tags": ["Users"],
@@ -97,8 +95,7 @@
           }
         }
       }
-    }
-   },
+     },
       "/get-report": {
       "get": {
         "tags": ["Users"],
@@ -111,9 +108,9 @@
             "description": "internal server error"
         }
       }
-    }
-   },
-   "/logout": {
+     }
+    },
+    "/logout": {
       "get": {
         "tags": ["Users"],
         "produces": ["application/json"],
@@ -125,8 +122,8 @@
             "description": "Need Token or nothing token in cookies"
         }
       }
-    }
-   },
+     }
+    },
    "/start-instance": {
       "post": {
         "tags": ["Instance"],
@@ -148,8 +145,8 @@
         }
     }
    }
-   }
-},
+}
+    },
   "definitions": {
        "Pengawas": {
       "required": ["id_pengawas", "nip", "nama_pengawas", "email", "password"],
