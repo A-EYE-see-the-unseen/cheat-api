@@ -1,97 +1,100 @@
 {
-  "swagger": "2.0",
-  "info": {
-    "version": "1.0.0",
-    "title": "Cheat App",
-    "description": "My Project Application API",
-    "license": {
-      "name": "MIT",
-      "url": "https://opensource.org/licenses/MIT"
-    }
-  },
-  "host": "localhost:3000",
-  "basePath": "/api",
-  "tags": [
-    {
-      "name": "Users",
-      "description": "API for users in the system"
+    "swagger": "2.0",
+    "info": {
+      "version": "1.0.0",
+      "title": "Cheat App",
+      "description": "My Project Application API",
+      "license": {
+        "name": "MIT",
+        "url": "https://opensource.org/licenses/MIT"
+      }
     },
-    {
-      "name": "Instance",
-      "description": "API for related Instance Environtment"
-    }
-  ],
-  "schemes": ["http"],
-  "consumes": ["application/json"],
-  "produces": ["application/json"],
-  "paths": {
-    "/register": {
-      "post": {
-        "tags": ["Users"],
-          "parameters": [
-          {
-            "name": "pengawas",
-            "in": "body",
-            "description": "User that we want to create"
+    "host": "a-eye-project.et.r.appspot.com",
+    "basePath": "/api",
+    "tags": [
+      {
+        "name": "Users",
+        "description": "API for users in the system"
+      },
+      {
+        "name": "Instance",
+        "description": "API for related Instance Environtment"
+      }
+    ],
+    "schemes": ["http","https"],
+    "consumes": ["application/json"],
+    "produces": ["application/json"],
+    "paths": {
+      "/register": {
+        "post": {
+          "tags": ["Users"],
+            "parameters": [
+            {
+              "name": "pengawas",
+              "in": "body",
+              "description": "sample : { \"nip\":\"123456789\", \"nama_pengawas\":\"Huda\", \"email\":\"huda@gmail.com\", \"password\":\"huda123\" } "
+            }
+          ],
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "New user is created"
           }
-        ],
-        "produces": ["application/json"],
-        "responses": {
-          "200": {
-            "description": "New user is created"
         }
       }
     }
-   },
-   "/login": {
-      "post": {
-        "tags": ["Users"],
-          "parameters": [
-          {
-            "name": "pengawas",
-            "in": "body",
-            "description": "Login Pengawas"
+     },
+     "/login": {
+        "post": {
+          "tags": ["Users"],
+            "parameters": [
+            {
+              "name": "pengawas",
+              "in": "body",
+              "description": "sample : { \"email\":\"huda@gmail.com\", \"password\":\"huda123\" }"
+            }
+          ],
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "Success Login"
           }
-        ],
-        "produces": ["application/json"],
-        "responses": {
-          "200": {
-            "description": "Success Login"
         }
       }
     }
-   },
-   "/verify-token": {
-      "get": {
-        "tags": ["Users"],
-        "produces": ["application/json"],
-        "responses": {
-          "200": {
-            "description": "Token already in Cookies"
-        },
-          "401": {
-            "description": "Need Token"
+     },
+     "/verify-token": {
+        "get": {
+          "tags": ["Users"],
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "Token already in Cookies"
+          },
+            "401": {
+              "description": "Need Token"
+          }
         }
       }
-    }
-   },
-    "/store-report": {
-      "post": {
-        "tags": ["Users"],
-          "parameters": [
-          {
-            "name": "data reporting",
-            "in": "body",
-            "description": "User that we want to create"
+     },
+      "/store-report": {
+        "post": {
+          "tags": ["Users"],
+            "parameters": [
+            {
+              "name": "data reporting",
+              "in": "body",
+              "description": "sample : { \"keterangan\":\"Huda Ngecheat ya, ketahuan!\" }"
+            }
+          ],
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "success store data report"
+          },
+          "500": {
+              "description": "internal server error"
           }
-        ],
-        "produces": ["application/json"],
-        "responses": {
-          "200": {
-            "description": "success store data report"
-        },
-        "500": {
-            "description": "internal server error"
         }
       }
     }
@@ -189,4 +192,3 @@
   }
   }
 }
-  
