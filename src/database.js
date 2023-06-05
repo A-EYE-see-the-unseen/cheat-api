@@ -1,15 +1,15 @@
 const mysql = require("mysql");
 const Connection = mysql.createConnection({
-  host: "34.128.124.77",
-  user: "root",
-  password: "12345",
-  database: "cheating",
+  host: "",
+  user: "",
+  password: "",
+  database: "",
   port: 3306,
 });
 
 Connection.connect(function (err) {
   if (err) {
-    console.log("error in ");
+    console.log("error");
   } else {
     console.log("Database connected!");
   }
