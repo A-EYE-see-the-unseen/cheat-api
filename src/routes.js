@@ -215,12 +215,12 @@ router.post("/start-instance", async (req, res) => {
     const authClient = await auth.getClient();
     google.options({ auth: authClient });
     await compute.instances.start(requestInstance);
-    res.status(200).send("Instance started success!");
+    res.status(200).send({ message: "Instance started success!" });
   } catch (error) {
     console.log(
       `error at ${error} | ${requestInstance.project}, ${requestInstance.zone}`
     );
-    res.status(500).send("Failed to start instance.");
+    res.status(500).send({ message: "failed start instance!" });
   }
 });
 
@@ -229,9 +229,9 @@ router.post("/stop-instance", async (req, res) => {
     const authClient = await auth.getClient();
     google.options({ auth: authClient });
     await compute.instances.stop(requestInstance);
-    res.status(200).send("Instance stopped success!");
+    res.status(200).send({ message: "Instance stopped success!" });
   } catch (error) {
-    res.status(500).send("Failed to stop instance.");
+    res.status(500).send({ message: "Instance stopped failed!" });
   }
 });
 
