@@ -1,4 +1,5 @@
 const express = require("express");
+const socket = require("socket.io");
 const router = express.Router();
 const Connection = require("./database");
 const { registerValidation, loginValidation } = require("./validation");
@@ -8,8 +9,8 @@ const logger = require("./logger");
 const { google } = require("googleapis");
 const shortId = require("short-uuid");
 const compute = google.compute("v1");
-const requestInstance = require("./secret/instance");
-const moment = require("moment");
+const { server } = require("./server");
+const io = socket(server);
 
 // ====== Public Variables =======
 const auth = new google.auth.GoogleAuth({
@@ -130,6 +131,23 @@ router.get("/verify-token", (req, res, next) => {
   }
 });
 
+// socket-server
+router.post('/socket-server', (req, res) => {
+  const { image_url } = req.body;
+  io.on('connection', (socket) => {
+    console.log("New socket connection: " + socket.id);
+    socket.on('send', () => {
+      try {
+        io.emit('hasil', image_url);
+        res.status(200).send({ message: 'success sending url' });
+      } catch (error) {
+        console.error("Error sending URL:", error);
+        res.status(500).send({ message: 'failed to send url' });
+      }
+    });
+  });
+});
+
 // store report cheating
 router.post("/store-report", (req, res) => {
   const token = req.cookies.token;
@@ -140,7 +158,7 @@ router.post("/store-report", (req, res) => {
   const payload = jwt.verify(token, "the-super-strong-secrect");
   try {
     const id_report = shortId.generate();
-    const tanggal = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
+    const tanggal = new Date().toISOString().slice(0, 19).replace("T", " ");
     const { keterangan } = req.body;
     const id_pengawas = payload.id_pengawas;
 
@@ -167,22 +185,25 @@ router.post("/store-report", (req, res) => {
 });
 
 // get data report
-router.get("/get-report", (req, res) => {
+router.get("/report", (req, res) => {
   const token = req.cookies.token;
   if (!token) {
     return res.status(401).send({
       message: "Cannot get data, login session or token is required",
     });
   }
-
+  
   try {
-    Connection.query("SELECT * FROM report", (err, result) => {
-      if (err) {
-        throw err;
-        return res.status(500).send({ message: `Error: ${err.message}` });
+    Connection.query(
+      "SELECT * FROM report",
+      (err, result) => {
+        if (err) {
+          throw err;
+          return res.status(500).send({ message: `Error: ${err.message}` });
+        }
+        return res.status(200).json(result);
       }
-      return res.status(200).json(result);
-    });
+    );
   } catch (err) {
     console.error(err);
     return res.status(500).send({ message: `Error: ${err.message}` });
@@ -215,12 +236,12 @@ router.post("/start-instance", async (req, res) => {
     const authClient = await auth.getClient();
     google.options({ auth: authClient });
     await compute.instances.start(requestInstance);
-    res.status(200).send({ message: "Instance started success!" });
+    res.status(200).send("Instance started success!");
   } catch (error) {
     console.log(
       `error at ${error} | ${requestInstance.project}, ${requestInstance.zone}`
     );
-    res.status(500).send({ message: "failed start instance!" });
+    res.status(500).send("Failed to start instance.");
   }
 });
 
@@ -229,9 +250,9 @@ router.post("/stop-instance", async (req, res) => {
     const authClient = await auth.getClient();
     google.options({ auth: authClient });
     await compute.instances.stop(requestInstance);
-    res.status(200).send({ message: "Instance stopped success!" });
+    res.status(200).send("Instance stopped success!");
   } catch (error) {
-    res.status(500).send({ message: "Instance stopped failed!" });
+    res.status(500).send("Failed to stop instance.");
   }
 });
 
