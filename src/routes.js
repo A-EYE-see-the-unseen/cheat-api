@@ -1,5 +1,4 @@
 const express = require("express");
-const socket = require("socket.io");
 const router = express.Router();
 const Connection = require("./database");
 const { registerValidation, loginValidation } = require("./validation");
@@ -9,8 +8,9 @@ const logger = require("./logger");
 const { google } = require("googleapis");
 const shortId = require("short-uuid");
 const compute = google.compute("v1");
-const { server } = require("./server");
-const io = socket(server);
+const { server, connectSocket, io } = require("./server");
+const app = express();
+
 
 // ====== Public Variables =======
 const auth = new google.auth.GoogleAuth({
@@ -134,18 +134,14 @@ router.get("/verify-token", (req, res, next) => {
 // socket-server
 router.post('/socket-server', (req, res) => {
   const { image_url } = req.body;
-  io.on('connection', (socket) => {
-    console.log("New socket connection: " + socket.id);
-    socket.on('send', () => {
-      try {
-        io.emit('hasil', image_url);
-        res.status(200).send({ message: 'success sending url' });
+  try {
+       req.app.io.emit('hasil', image_url);
+       console.log(`Output emit is ${image_url}`)
+      res.status(200).send({ message: `success sending url ${image_url}` });  
       } catch (error) {
         console.error("Error sending URL:", error);
         res.status(500).send({ message: 'failed to send url' });
       }
-    });
-  });
 });
 
 // store report cheating
