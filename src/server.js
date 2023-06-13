@@ -15,14 +15,19 @@ app.use(
     extended: true,
   })
 );
-app.use(cors());
-app.get("/", (req, res) => {
-  res.send("Response Success!");
-});
+app.use(
+  cors({
+    origin: ["*"],
+    methods: ["POST", "GET"],
+  })
+);
+
 app.use("/api", router);
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-const port = process.env.PORT || 8000;
-app.listen(port, () => {
+const port = process.env.PORT || 3000;
+const server = app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
+
+module.exports = server;
