@@ -9,7 +9,7 @@
         "url": "https://opensource.org/licenses/MIT"
       }
     },
-    "host": "localhost:8000",
+    "host": "https://a-eye-project.et.r.appspot.com",
     "basePath": "/api",
     "tags": [
       {
