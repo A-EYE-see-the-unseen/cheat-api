@@ -10,6 +10,9 @@ const shortId = require("short-uuid");
 const compute = google.compute("v1");
 const requestInstance = require("./secret/instance");
 const moment = require("moment");
+const PDFDocument = require("pdfkit");
+const fs = require("fs");
+const axios = require("axios");
 
 // ====== Public Variables =======
 const auth = new google.auth.GoogleAuth({
@@ -141,7 +144,7 @@ router.post("/store-report", (req, res) => {
   try {
     const id_report = shortId.generate();
     const tanggal = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
-    const { keterangan } = req.body;
+    const { foto, keterangan } = req.body;
     const id_pengawas = payload.id_pengawas;
 
     logger.log(
@@ -150,7 +153,7 @@ router.post("/store-report", (req, res) => {
     );
 
     Connection.query(
-      `INSERT INTO report (id_report, tanggal, keterangan, id_pengawas) VALUES ("${id_report}", "${tanggal}", "${keterangan}", ${id_pengawas})`,
+      `INSERT INTO report (id_report, tanggal, foto, keterangan, id_pengawas) VALUES ("${id_report}", "${tanggal}", "${foto}", "${keterangan}", ${id_pengawas})`,
       (err, result) => {
         if (err) {
           throw err;
@@ -174,15 +177,117 @@ router.get("/get-report", (req, res) => {
       message: "Cannot get data, login session or token is required",
     });
   }
-
+  const doc = new PDFDocument({ size: "A4" });
   try {
-    Connection.query("SELECT * FROM report", (err, result) => {
-      if (err) {
-        throw err;
-        return res.status(500).send({ message: `Error: ${err.message}` });
+    Connection.query(
+      "SELECT report.id_report, report.tanggal, report.foto, report.keterangan, pengawas.nama_pengawas FROM report INNER JOIN pengawas ON report.id_pengawas = pengawas.id_pengawas",
+      async (err, result) => {
+        if (err) {
+          throw err;
+          return res.status(500).send({ message: `Error: ${err.message}` });
+        }
+        const data = [];
+        for (const row of result) {
+          const { id_report, tanggal, foto, keterangan, nama_pengawas } = row;
+          logger.log("info", `${nama_pengawas}`);
+          data.push({
+            id_report,
+            tanggal,
+            foto,
+            keterangan,
+            nama_pengawas,
+          });
+        }
+
+        const addImageFromURL = (url) => {
+          return new Promise((resolve, reject) => {
+            axios
+              .get(url, { responseType: "arraybuffer" })
+              .then((response) => {
+                const image = response.data;
+                const imageWidth = 180;
+                const imageHeight = 100;
+
+                // Available Space
+                const availableWidth =
+                  doc.page.width -
+                  doc.page.margins.left -
+                  doc.page.margins.right;
+                const availableHeight =
+                  doc.page.height -
+                  doc.page.margins.top -
+                  doc.page.margins.bottom -
+                  doc.y;
+
+                // Calculate the scale to fit the image within the available space
+                const scale = Math.min(
+                  availableWidth / imageWidth,
+                  availableHeight / imageHeight
+                );
+
+                // Calculate the position to center the image within the available space
+                const imageX =
+                  (availableWidth - imageWidth * scale) / 2 +
+                  doc.page.margins.left;
+                const imageY = doc.y;
+
+                // Centered and Scaled
+                doc
+                  .image(image, imageX, imageY, {
+                    width: imageWidth * scale,
+                    height: imageHeight * scale,
+                  })
+                  .moveDown(1);
+                resolve();
+                console.log("Success fetch image");
+              })
+              .catch((error) => {
+                console.error("Gagal fetch gambar dari URL:", error);
+                reject(error);
+              });
+          });
+        };
+
+        const addDescription = (
+          id_report,
+          tanggal,
+          keterangan,
+          nama_pengawas
+        ) => {
+          const removeLineBreak = keterangan.replace(/\r\n/g, " ");
+          doc
+            .fontSize(10)
+            .text(
+              `ID Report : ${id_report} | Tanggal : ${tanggal.toLocaleDateString()}`
+            )
+            .moveDown(0.2);
+          doc
+            .fontSize(10)
+            .text(`Nama Pengawas : ${nama_pengawas}`)
+            .moveDown(0.2);
+
+          doc
+            .fontSize(10)
+            .text(`Keterangan : \n${removeLineBreak}`)
+            .moveDown(2);
+        };
+
+        for (const item of data) {
+          const { id_report, tanggal, foto, keterangan, nama_pengawas } = item;
+          logger.log("info", `this image is ${foto}`);
+          await addImageFromURL(foto);
+          await addDescription(id_report, tanggal, keterangan, nama_pengawas);
+        }
+        const today = new Date().toISOString().split("T")[0];
+        // Save the PDF to a file
+        doc.pipe(fs.createWriteStream(`Laporan Tanggal ${today}.pdf`));
+        doc.end();
+
+        return res.status(200).send({
+          message: "Success Generate Pdf",
+        });
       }
-      return res.status(200).json(result);
-    });
+    );
   } catch (err) {
     console.error(err);
     return res.status(500).send({ message: `Error: ${err.message}` });

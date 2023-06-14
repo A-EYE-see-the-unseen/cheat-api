@@ -13,16 +13,19 @@
     "nodemon": "^2.0.22"
   },
   "dependencies": {
+    "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "express": "^4.18.2",
     "express-validator": "^7.0.1",
+    "fs": "^0.0.1-security",
     "googleapis": "^118.0.0",
     "jsonwebtoken": "^9.0.0",
     "moment": "^2.29.4",
     "mysql": "^2.18.1",
+    "pdfkit": "^0.13.0",
     "short-uuid": "^4.2.2",
     "swagger-ui-express": "^4.6.3",
     "winston": "^3.8.2"
