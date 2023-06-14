@@ -21,7 +21,7 @@
         "description": "API for related Instance Environtment"
       }
     ],
-    "schemes": ["http","https"],
+    "schemes": ["https"],
     "consumes": ["application/json"],
     "produces": ["application/json"],
     "paths": {
@@ -199,6 +199,9 @@
         },
         "tanggal": {
           "type": "timestamp"
+        },
+        "foto": {
+          "type": "string"
         },
         "keterangan": {
           "type": "string"
