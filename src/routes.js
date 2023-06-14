@@ -13,6 +13,8 @@ const moment = require("moment");
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const axios = require("axios");
+// const { server, connectSocket, io } = require("./server");
+// const app = express();
 
 // ====== Public Variables =======
 const auth = new google.auth.GoogleAuth({
@@ -130,6 +132,19 @@ router.get("/verify-token", (req, res, next) => {
           .send({ id_pengawas: id, message: "still in session auth" });
       }
     });
+  }
+});
+
+// socket-server
+router.post("/socket-server", (req, res) => {
+  const { image_url } = req.body;
+  try {
+    req.app.io.emit("hasil", image_url);
+    console.log(`Output emit is ${image_url}`);
+    res.status(200).send({ message: `success sending url ${image_url}` });
+  } catch (error) {
+    console.error("Error sending URL:", error);
+    res.status(500).send({ message: "failed to send url" });
   }
 });
 

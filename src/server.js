@@ -6,6 +6,7 @@ const router = require("./routes");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("../swagger.json");
 const app = express();
+const socket = require("socket.io");
 
 app.use(express.json());
 app.use(bodyParser.json());
@@ -19,10 +20,19 @@ app.use(cors());
 app.get("/", (req, res) => {
   res.send("Response Success!");
 });
+
 app.use("/api", router);
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 const port = process.env.PORT || 8000;
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
+
+const io = socket(server);
+app.io = io;
+io.on("connection", (socket) => {
+  console.log("socket connection id : " + socket.id);
+});
+
+module.exports = { server, io };
