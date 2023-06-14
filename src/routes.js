@@ -179,94 +179,115 @@ router.get("/get-report", (req, res) => {
   }
   const doc = new PDFDocument({ size: "A4" });
   try {
-    Connection.query("SELECT * FROM report", (err, result) => {
-      if (err) {
-        throw err;
-        return res.status(500).send({ message: `Error: ${err.message}` });
-      }
-      const data = [];
-      for (const row of result) {
-        const { id_report, tanggal, foto, keterangan, id_pengawas } = row;
-        data.push({
+    Connection.query(
+      "SELECT report.id_report, report.tanggal, report.foto, report.keterangan, pengawas.nama_pengawas FROM report INNER JOIN pengawas ON report.id_pengawas = pengawas.id_pengawas",
+      async (err, result) => {
+        if (err) {
+          throw err;
+          return res.status(500).send({ message: `Error: ${err.message}` });
+        }
+        const data = [];
+        for (const row of result) {
+          const { id_report, tanggal, foto, keterangan, nama_pengawas } = row;
+          logger.log("info", `${nama_pengawas}`);
+          data.push({
+            id_report,
+            tanggal,
+            foto,
+            keterangan,
+            nama_pengawas,
+          });
+        }
+
+        const addImageFromURL = (url) => {
+          return new Promise((resolve, reject) => {
+            axios
+              .get(url, { responseType: "arraybuffer" })
+              .then((response) => {
+                const image = response.data;
+                const imageWidth = 180;
+                const imageHeight = 100;
+
+                // Available Space
+                const availableWidth =
+                  doc.page.width -
+                  doc.page.margins.left -
+                  doc.page.margins.right;
+                const availableHeight =
+                  doc.page.height -
+                  doc.page.margins.top -
+                  doc.page.margins.bottom -
+                  doc.y;
+
+                // Calculate the scale to fit the image within the available space
+                const scale = Math.min(
+                  availableWidth / imageWidth,
+                  availableHeight / imageHeight
+                );
+
+                // Calculate the position to center the image within the available space
+                const imageX =
+                  (availableWidth - imageWidth * scale) / 2 +
+                  doc.page.margins.left;
+                const imageY = doc.y;
+
+                // Centered and Scaled
+                doc
+                  .image(image, imageX, imageY, {
+                    width: imageWidth * scale,
+                    height: imageHeight * scale,
+                  })
+                  .moveDown(1);
+                resolve();
+                console.log("Success fetch image");
+              })
+              .catch((error) => {
+                console.error("Gagal fetch gambar dari URL:", error);
+                reject(error);
+              });
+          });
+        };
+
+        const addDescription = (
           id_report,
           tanggal,
-          foto,
           keterangan,
-          id_pengawas,
+          nama_pengawas
+        ) => {
+          const removeLineBreak = keterangan.replace(/\r\n/g, " ");
+          doc
+            .fontSize(10)
+            .text(
+              `ID Report : ${id_report} | Tanggal : ${tanggal.toLocaleDateString()}`
+            )
+            .moveDown(0.2);
+          doc
+            .fontSize(10)
+            .text(`Nama Pengawas : ${nama_pengawas}`)
+            .moveDown(0.2);
+
+          doc
+            .fontSize(10)
+            .text(`Keterangan : \n${removeLineBreak}`)
+            .moveDown(2);
+        };
+
+        for (const item of data) {
+          const { id_report, tanggal, foto, keterangan, nama_pengawas } = item;
+          logger.log("info", `this image is ${foto}`);
+          await addImageFromURL(foto);
+          await addDescription(id_report, tanggal, keterangan, nama_pengawas);
+        }
+        const today = new Date().toISOString().split("T")[0];
+        // Save the PDF to a file
+        doc.pipe(fs.createWriteStream(`Laporan Tanggal ${today}.pdf`));
+        doc.end();
+
+        return res.status(200).send({
+          message: "Success Generate Pdf",
         });
       }
-
-      const addImageFromURL = async (url) => {
-        return new Promise((resolve, reject) => {
-          axios
-            .get(url, { responseType: "arraybuffer" })
-            .then((response) => {
-              const image = response.data;
-
-              const imageWidth = 250; // Desired width of the image
-              const imageHeight = 150; // Desired height of the image
-
-              // Available Space
-              const availableWidth =
-                doc.page.width - doc.page.margins.left - doc.page.margins.right;
-              const availableHeight =
-                doc.page.height -
-                doc.page.margins.top -
-                doc.page.margins.bottom -
-                doc.y;
-
-              // Calculate the scale to fit the image within the available space
-              const scale = Math.min(
-                availableWidth / imageWidth,
-                availableHeight / imageHeight
-              );
-
-              // Calculate the position to center the image within the available space
-              const imageX =
-                (availableWidth - imageWidth * scale) / 2 +
-                doc.page.margins.left;
-              const imageY = doc.y;
-
-              // Centered and Scaled
-              doc
-                .image(image, imageX, imageY, {
-                  width: imageWidth * scale,
-                  height: imageHeight * scale,
-                })
-                .moveDown(1);
-              resolve();
-            })
-            .catch((error) => {
-              console.error("Gagal fetch gambar dari URL:", error);
-              reject(error);
-            });
-        });
-      };
-
-      const addDescription = (x, y, z) => {
-        //Hapus Line Break
-        //Catatan: Jika tidak dihapus line break dari SQL maka akan terdapat "D" setelah kata.
-        const removeLineBreak = y.replace(/\r\n/g, " ");
-        doc.fontSize(20).text(z).moveDown(0.2);
-        doc.fontSize(8).text(x).moveDown(2);
-        doc.fontSize(12).text(removeLineBreak).moveDown(4);
-      };
-
-      for (const item of data) {
-        const { id_report, tanggal, foto, keterangan, id_pengawas } = item;
-
-        addImageFromURL(foto);
-        addDescription(tanggal, keterangan, id_pengawas);
-      }
-      const today = new Date().toISOString().split("T")[0];
-
-      // Save the PDF to a file
-      doc.pipe(fs.createWriteStream(`Laporan Tanggal ${today}.pdf`));
-
-      return res.status(200).send({
-        message: "Success Generate Pdf",
-      });
-    });
+    );
   } catch (err) {
     console.error(err);
     return res.status(500).send({ message: `Error: ${err.message}` });
