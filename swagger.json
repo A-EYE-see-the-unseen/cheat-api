@@ -110,6 +110,27 @@
       }
      }
     },
+    "/socket-server": {
+        "post": {
+          "tags": ["Users"],
+            "parameters": [
+            {
+              "name": "To sending url image",
+              "in": "body",
+              "description": "sample : { \"image_url\":\"https://storage.googleapis.com/inputed-image/img_e1fdc723-4bb9-4997-96ef-f3e6b442a493.jpeg\" }"
+            }
+          ],
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "success sending url"
+          },
+          "500": {
+              "description": "error sending url"
+          }
+        }
+      }
+     },
     "/logout": {
       "get": {
         "tags": ["Users"],
