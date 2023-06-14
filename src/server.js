@@ -24,7 +24,7 @@ app.get("/", (req, res) => {
 app.use("/api", router);
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-const port = process.env.PORT || 8000;
+const port = process.env.PORT || 8080;
 const server = app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
@@ -35,4 +35,4 @@ io.on("connection", (socket) => {
   console.log("socket connection id : " + socket.id);
 });
 
-module.exports = { server, io };
+// module.exports = { server, io };
