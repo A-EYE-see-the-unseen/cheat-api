@@ -13,6 +13,8 @@ const moment = require("moment");
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const axios = require("axios");
+const dotenv = require("dotenv");
+dotenv.config();
 // const { server, connectSocket, io } = require("./server");
 // const app = express();
 
@@ -22,6 +24,21 @@ const auth = new google.auth.GoogleAuth({
   scopes: ["https://www.googleapis.com/auth/compute"],
 });
 
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (token == null) return res.status(401).send({ message: "need token" });
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    if (err) return res.status(403).send({ message: `error in ${err}` });
+    req.user = user;
+    next();
+  });
+}
+
+function generateAccessToken(id) {
+  return jwt.sign(id, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
+}
 // ====== Handler ========
 
 // Register Pengawas
@@ -93,14 +110,13 @@ router.post("/login", loginValidation, (req, res) => {
           });
         }
         if (bResult) {
-          const id_pengawas = result[0].id_pengawas;
-          const token = jwt.sign({ id_pengawas }, "the-super-strong-secrect", {
-            expiresIn: "1d",
+          const accessToken = generateAccessToken({
+            id_pengawas: result[0].id_pengawas,
           });
-          res.cookie("token", token);
+          // res.cookie("token", token);
           logger.log("info", `Succees Login ${email}`);
           return res.status(200).send({
-            token,
+            accessToken: accessToken,
             user: result[0],
           });
         }
@@ -110,29 +126,6 @@ router.post("/login", loginValidation, (req, res) => {
       });
     }
   );
-});
-
-// verify token JWT
-router.get("/verify-token", (req, res, next) => {
-  const token = req.cookies.token;
-  if (!token) {
-    return res.status(401).send({
-      message: "need login or token!",
-    });
-  } else {
-    jwt.verify(token, "the-super-strong-secrect", (err, decoded) => {
-      if (err) {
-        return res.status(400).send({
-          message: "Auth Error!",
-        });
-      } else {
-        const id = decoded.id_pengawas;
-        return res
-          .status(200)
-          .send({ id_pengawas: id, message: "still in session auth" });
-      }
-    });
-  }
 });
 
 // socket-server
@@ -149,14 +142,12 @@ router.post("/socket-server", (req, res) => {
 });
 
 // store report cheating
-router.post("/store-report", (req, res) => {
-  const token = req.cookies.token;
-  if (!token)
-    return res.status(401).send({
-      message: "cannot store data, need login session or token",
-    });
-  const payload = jwt.verify(token, "the-super-strong-secrect");
+router.post("/store-report", authenticateToken, (req, res) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
   try {
+    // const {user.id_pengawas} = user;
     const id_report = shortId.generate();
     const tanggal = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
     const { foto, keterangan } = req.body;
@@ -186,19 +177,12 @@ router.post("/store-report", (req, res) => {
 
 // get data report
 router.get("/get-report", (req, res) => {
-  const token = req.cookies.token;
-  if (!token) {
-    return res.status(401).send({
-      message: "Cannot get data, login session or token is required",
-    });
-  }
   const doc = new PDFDocument({ size: "A4" });
   try {
     Connection.query(
-      "SELECT report.id_report, report.tanggal, report.foto, report.keterangan, pengawas.nama_pengawas FROM report INNER JOIN pengawas ON report.id_pengawas = pengawas.id_pengawas",
+      "SELECT id_report, tanggal, foto, keterangan, nama_pengawas FROM report INNER JOIN pengawas ON report.id_pengawas = pengawas.id_pengawas",
       async (err, result) => {
         if (err) {
-          throw err;
           return res.status(500).send({ message: `Error: ${err.message}` });
         }
         const data = [];
@@ -310,19 +294,15 @@ router.get("/get-report", (req, res) => {
 });
 
 // Logout Pengawas
-router.get("/logout", (req, res) => {
+router.post("/logout", authenticateToken, (req, res) => {
   try {
-    const token = req.cookies.token;
-    if (!token) {
-      return res.status(401).send({
-        message: "need login or token null",
-      });
-    } else {
-      res.clearCookie("token");
-      return res.status(200).send({
-        message: "Success Logout!",
-      });
+    const authHeader = req.headers["authorization"];
+    if (authHeader) {
+      req.token = authHeader.replace("Bearer ", "");
     }
+    return res.status(200).send({
+      message: "Success Logout!",
+    });
   } catch (err) {
     return res.status(500).send({
       message: `${err}`,
