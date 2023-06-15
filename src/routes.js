@@ -15,8 +15,6 @@ const fs = require("fs");
 const axios = require("axios");
 const dotenv = require("dotenv");
 dotenv.config();
-// const { server, connectSocket, io } = require("./server");
-// const app = express();
 
 // ====== Public Variables =======
 const auth = new google.auth.GoogleAuth({
@@ -44,7 +42,7 @@ function generateAccessToken(id) {
 // Register Pengawas
 router.post("/register", registerValidation, (req, res) => {
   const { nip, nama_pengawas, email, password } = req.body;
-  logger.log("info", `${nip} ${nama_pengawas} ${email} ${password}`);
+  logger.log("info", `${(nip, nama_pengawas, email)}`);
 
   Connection.query(
     `SELECT * FROM pengawas WHERE LOWER(email) = LOWER(${Connection.escape(
@@ -68,7 +66,6 @@ router.post("/register", registerValidation, (req, res) => {
               )}, ${Connection.escape(hash)})`,
               (err, result) => {
                 if (err) {
-                  throw err;
                   return res.status(400).send({
                     msg: err,
                   });
@@ -92,7 +89,6 @@ router.post("/login", loginValidation, (req, res) => {
     `SELECT * FROM pengawas WHERE email = ${Connection.escape(email)};`,
     (err, result) => {
       if (err) {
-        throw err;
         return res.status(400).send({
           msg: err,
         });
@@ -104,7 +100,6 @@ router.post("/login", loginValidation, (req, res) => {
       }
       bcrypt.compare(password, result[0]["password"], (bError, bResult) => {
         if (bError) {
-          throw bError;
           return res.status(401).send({
             msg: "Email or password is incorrect!",
           });
@@ -113,7 +108,6 @@ router.post("/login", loginValidation, (req, res) => {
           const accessToken = generateAccessToken({
             id_pengawas: result[0].id_pengawas,
           });
-          // res.cookie("token", token);
           logger.log("info", `Succees Login ${email}`);
           return res.status(200).send({
             accessToken: accessToken,
@@ -147,7 +141,6 @@ router.post("/store-report", authenticateToken, (req, res) => {
   const token = authHeader && authHeader.split(" ")[1];
   const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
   try {
-    // const {user.id_pengawas} = user;
     const id_report = shortId.generate();
     const tanggal = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
     const { foto, keterangan } = req.body;
@@ -176,7 +169,7 @@ router.post("/store-report", authenticateToken, (req, res) => {
 });
 
 // get data report
-router.get("/get-report", (req, res) => {
+router.get("/get-report", authenticateToken, (req, res) => {
   const doc = new PDFDocument({ size: "A4" });
   try {
     Connection.query(
@@ -298,7 +291,7 @@ router.post("/logout", authenticateToken, (req, res) => {
   try {
     const authHeader = req.headers["authorization"];
     if (authHeader) {
-      req.token = authHeader.replace("Bearer ", "");
+      req.token = authHeader.replace("Bearer ", " ");
     }
     return res.status(200).send({
       message: "Success Logout!",
