@@ -9,7 +9,7 @@
         "url": "https://opensource.org/licenses/MIT"
       }
     },
-    "host": "https://a-eye-project.et.r.appspot.com",
+    "host": "a-eye-project.et.r.appspot.com",
     "basePath": "/api",
     "tags": [
       {
@@ -61,20 +61,6 @@
         }
       }
       },
-     "/verify-token": {
-        "get": {
-          "tags": ["Users"],
-          "produces": ["application/json"],
-          "responses": {
-            "200": {
-              "description": "Token already in Cookies"
-          },
-            "401": {
-              "description": "Need Token"
-          }
-        }
-      }
-      },
       "/store-report": {
         "post": {
           "tags": ["Users"],
@@ -82,7 +68,7 @@
             {
               "name": "data reporting",
               "in": "body",
-              "description": "sample : { \"keterangan\":\"Huda Ngecheat ya, ketahuan!\" }"
+              "description": "[menggunakan url public image yg valid agar tidak error] sample : { \"foto\":\"https://storage.googleapis.com/inputed-image/img_26d170be-8e88-4650-9ad2-ce95370d1b6f.jpeg\", \"keterangan\":\"Huda Ngecheat ya, ketahuan!\" }"
             }
           ],
           "produces": ["application/json"],
