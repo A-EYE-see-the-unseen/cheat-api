@@ -271,13 +271,24 @@ router.get("/get-report", authenticateToken, (req, res) => {
           await addDescription(id_report, tanggal, keterangan, nama_pengawas);
         }
         const today = new Date().toISOString().split("T")[0];
-        // Save the PDF to a file
-        doc.pipe(fs.createWriteStream(`Laporan Tanggal ${today}.pdf`));
-        doc.end();
 
-        return res.status(200).send({
-          message: "Success Generate Pdf",
+        const pdfBuffer = await new Promise((resolve, reject) => {
+          const dataTemps = [];
+          doc.on("data", (data) => dataTemps.push(data));
+          doc.on("end", () => resolve(Buffer.concat(dataTemps)));
+          doc.end();
         });
+
+        res
+          .set({
+            "Content-Type": "application/pdf",
+            "Content-Disposition": `attachment; filename="Laporan Tanggal ${today}.pdf"`,
+          })
+          .status(200)
+          .send(pdfBuffer);
+        console.log(
+          `File "Laporan Tanggal ${today}.pdf" successfully sent to the client.`
+        );
       }
     );
   } catch (err) {
